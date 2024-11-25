@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
 use App\Models\Hardware;
 use App\Models\Jaringan;
 use App\Models\Software;
@@ -15,8 +17,6 @@ use App\Models\SoftwareM;
 use App\Models\LocotrackL;
 use App\Models\LocotrackM;
 use App\Models\LocotrackT;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HardLController;
 use App\Http\Controllers\HardMController;
 use App\Http\Controllers\HardTController;
@@ -28,17 +28,12 @@ use App\Http\Controllers\SoftMController;
 use App\Http\Controllers\SoftTController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LayananController;
-use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JaringanLController;
 use App\Http\Controllers\JaringanMController;
 use App\Http\Controllers\JaringanTController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\TroubleshootController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\Auth\RegisteredUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,52 +50,15 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::prefix('auth')->middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('auth.register');
+Route::get('/dashboard', function () {
+    return view('dashboard.index');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-    Route::post('/register', [RegisterController::class, 'create'])->name('register');
-
-    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
-    Route::middleware('guest')->group(function () {
-        Route::get('/register', [RegisteredUserController::class, 'showRegistrationForm'])->name('auth.register');
-        Route::post('/reset-password', [ResetPasswordController::class, 'resetPassword'])->middleware('auth')->name('reset-password');
-
-
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-
-
-});
-
-Route::match(['get', 'post'], '/login', [LoginController::class, 'index'])->name('login');
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('auth.login');
-Route::post('/login', [LoginController::class, 'login']);
-
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('auth.login');
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-});
-
-Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::post('/login', [LoginController::class, 'login']);
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth');
-Route::post('/dashboard', [DashboardController::class, 'store']);
-Route::match(['get', 'post'], '/dashboard', [DashboardController::class, 'index']);
-
-Route::get('/login', [AuthController::class, 'login']);
-Route::post('/login', [AuthController::class, 'dashboardlogin']);
-
-Route::post('/login-proses', [LoginController::class, 'login_proses'])->name('login-proses');
-Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
-
-Route::get('/dashboard', [DashboardController::class, 'index'])
-->middleware(['auth', 'verified'])
-->name('dashboard.index');
-
-Route::post('/reset-password', [ResetPasswordController::class, 'resetPassword'])->name('reset-password');
-
-
 //TAMPILAN 
 route::resource('/maintenance', MaintenanceController::class);
 Route::get('/hardwarem', [HardMController::class, 'index'])->name('hardwarem.index');
@@ -177,11 +135,5 @@ Route::get('/jaringant/{id}/edit', [JaringanTController::class, 'edit'])->name('
 Route::put('/jaringant/{id}', [JaringanTController::class, 'update'])->name('jaringant.update');
 Route::delete('/jaringant/{id}', [JaringanTController::class, 'destroy'])->name('jaringant.destroy');
 
-route::resource('/contact', ContactController::class);
-Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+require __DIR__.'/auth.php';

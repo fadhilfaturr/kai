@@ -98,6 +98,12 @@
     </a>
   </li>
   <li>
+    <a class="dropdown-item d-flex align-items-center" href="{{ route('logout') }}">
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Logout</span>
+    </a>
+  </li>
+  <li>
     <hr class="dropdown-divider">
   </li>
 
@@ -109,15 +115,9 @@
         <ul class="sidebar-nav" id="sidebar-nav">
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('dashboard.index') }}">
+                <a class="nav-link collapsed" href="{{ route('dashboard') }}">
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('logout') }}">
-                    <i class="bi bi-grid"></i>
-                    <span>Logout</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -140,11 +140,6 @@
               <i class="bi bi-circle"></i><span>Troubleshoot</span>
             </a>
           </li>
-          <li>
-            <a href="{{ route('contact.index') }}" class="active">
-              <i class="bi bi-circle"></i><span>Contact</span>
-            </a>
-          </li>
           <li><!-- End Dashboard Nav -->
         </ul>
 
@@ -157,10 +152,6 @@
     </div><!-- End Page Title -->
 
     @yield('dashboard')
-
-    @yield('content')
-
-    @yield('contact')
 
     @yield('maintenance')
 

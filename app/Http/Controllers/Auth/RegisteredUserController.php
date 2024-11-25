@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,43 +15,37 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    public function showRegistrationForm()
-    {
-        return view('auth.register'); // Pastikan file view register.blade.php ada di resources/views/auth/
-    }
-
     /**
-     * Display the registration view
+     * Display the registration view.
      */
     public function create()
     {
-        return view('auth.register'); // Pastikan view auth.register ada
+        return view('auth.register');
     }
 
     /**
-     * Handle on incoming regitration request
-     * 
-     * @throws \Illuminate\Validatetion\ValidationException
+     * Handle an incoming registration request.
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'username' => ['required', 'string', 'max:255'],
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'alpha_num', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
-            'username' => $request->username,
-            'password' => Hash::make($request->password),
+            'name' => $validated['name'],
+            'username' => $validated['username'],
+            'password' => Hash::make($validated['password']),
         ]);
-
-        // Arahkan ke halaman login setelah pendaftaran
-        return redirect()->route('auth.login')->with('success', 'Registration successful! Please login.');
 
         event(new Registered($user));
 
-        Auth::login($user);
+        Auth::login($user); 
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(RouteServiceProvider::HOME);
     }
-} 
+}
